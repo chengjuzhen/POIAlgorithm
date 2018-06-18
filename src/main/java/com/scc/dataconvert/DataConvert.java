@@ -95,7 +95,7 @@ public class DataConvert {
 
 
             LOG.info("开始 查询 business_test 表记录!");
-            String all_business = "select id,latitude,longitude,category from business_test,category where id=business_id ";
+            String all_business = "select id,latitude,longitude,category from business_test left join category on (id=business_id) ";
             ps = con.prepareStatement(all_business);
             ResultSet rs_business = ps.executeQuery(all_business);
             LOG.info("成功查询到 business_test 表所有 id,latitude,longitude 记录!");
@@ -104,7 +104,8 @@ public class DataConvert {
                 String business_id = rs_business.getString("id");
                 float latitude = rs_business.getFloat("latitude");
                 float longitude = rs_business.getFloat("longitude");
-                String category = rs_business.getString("category");
+                String category = rs_business.getString("category") == null ? "NO":rs_business.getString("category");
+
                 Object[] ll = new Object[3];
                 ll[0] = latitude;
                 ll[1] = longitude;
@@ -174,7 +175,11 @@ public class DataConvert {
 
                     String category = (String) ll[2];
 
+                    //tag with NO
                     double tag = categories.get(category) * 1.0 / size * 1.0;
+
+                    //tag without NO
+                    //double tag = category.equals("NO") == true ? 1.0 : categories.get(category) * 1.0 / size * 1.0;
 
                     Object[] line = new Object[4];
                     line[0] = business;
@@ -212,6 +217,8 @@ public class DataConvert {
             ps.executeUpdate(cal);
 
             ps.close();
+
+            LOG.info("review_test 的 rating 字段计算完成！");
 
         } catch(ClassNotFoundException e){
             LOG.error("找不到 mysql 驱动类!");

@@ -109,7 +109,8 @@ public class DataConvert {
                 ll[0] = latitude;
                 ll[1] = longitude;
                 ll[2] = category;
-                businessMap.put(business_id, ll);
+                //TODO 此处的business_id对应多值。不能直接放进map中
+                businessMap.put(business_id, ll);//此处待修改
 
             }
 

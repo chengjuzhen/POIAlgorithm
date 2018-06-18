@@ -71,12 +71,12 @@ public class DataConvert {
             if(!con.isClosed())
                 LOG.info(System.currentTimeMillis()+"Succeeded connecting to the Database(10.21.76.120)!");
 
-            LOG.info("开始 查询 user 表记录!");
+            LOG.info("开始 查询 new_user 表记录!");
 
-            String all_user = "select id from user ";
+            String all_user = "select id from new_user ";
             PreparedStatement ps = con.prepareStatement(all_user);
             ResultSet rs_user = ps.executeQuery(all_user);
-            LOG.info("成功查询到user表所有user_id记录!");
+            LOG.info("成功查询到new_user表所有user_id记录!");
 
 
             //获得所有用户列表
@@ -93,11 +93,11 @@ public class DataConvert {
             Map businessMap = new HashMap<String, Object[]>();
 
 
-            LOG.info("开始 查询 business 表记录!");
-            String all_business = "select id,latitude,longitude,category from business,category where id=business_id ";
+            LOG.info("开始 查询 new_business 表记录!");
+            String all_business = "select id,latitude,longitude,category from new_business,category where id=business_id ";
             ps = con.prepareStatement(all_business);
             ResultSet rs_business = ps.executeQuery(all_business);
-            LOG.info("成功查询到 business 表所有 id,latitude,longitude 记录!");
+            LOG.info("成功查询到 new_business 表所有 id,latitude,longitude 记录!");
 
             while (rs_business.next()){
                 String business_id = rs_business.getString("id");
@@ -121,7 +121,7 @@ public class DataConvert {
 
             for(String user_id : userList){
 //                LOG.info("开始 查询 review 表记录!");
-                String all_review = "select business_id from review where user_id='"+ user_id + "'";
+                String all_review = "select business_id from new_review where user_id='"+ user_id + "'";
                 ps = con.prepareStatement(all_review);
                 ResultSet rs_review = ps.executeQuery(all_review);
 //                LOG.info("成功查询到 review 表所有 business_id 记录!");
@@ -193,7 +193,7 @@ public class DataConvert {
                 double fd = (Double)line[2];
                 double tag = (Double)line[3];
 
-                String update_review = "update review set fd="+ fd +", tag="+ tag +" where business_id='"+business_id
+                String update_review = "update new_review set fd="+ fd +", tag="+ tag +" where business_id='"+business_id
                         +"' and user_id='" +user_id+"'";
                 ps = con.prepareStatement(update_review);
                 ps.executeUpdate(update_review);
@@ -202,7 +202,7 @@ public class DataConvert {
 
             }
 
-            String cal = "UPDATE review set rating = (stars*fd*tag) ";
+            String cal = "UPDATE new_review set rating = (stars*fd*tag) ";
             ps = con.prepareStatement(cal);
             ps.executeUpdate(cal);
 
@@ -367,7 +367,7 @@ public class DataConvert {
         String user = "root";
         String password = "111111";
 
-        String output = "E:/essayData/data/poi/rating/poi_rating_new.txt";
+        String output = "/home/cc01/data/poi/rating/poi_rating_new.txt";
         StringBuffer sb = new StringBuffer();
 
         DecimalFormat df=(DecimalFormat) NumberFormat.getInstance();
@@ -446,7 +446,7 @@ public class DataConvert {
         String user = "root";
         String password = "111111";
 
-        String output = "E:/essayData/data/poi/rating/poi_stars_new.txt";
+        String output = "/home/cc01/data/poi/rating/poi_stars_new.txt";
         StringBuffer sb = new StringBuffer();
 
         try{
@@ -610,7 +610,7 @@ public class DataConvert {
             Statement statement = con.createStatement();
 
 
-            String sql = "select count(*) as num from friend ";
+            String sql = "select count(*) as num from new_friend ";
             ResultSet rs = statement.executeQuery(sql);
 
             int count = 0;

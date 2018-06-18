@@ -72,7 +72,7 @@ public class DataConvert {
             if(!con.isClosed())
                 LOG.info(System.currentTimeMillis()+"Succeeded connecting to the Database(10.21.76.120)!");
 
-            LOG.info("开始 查询 user 表记录!");
+            LOG.info("开始 查询 user_test 表记录!");
 
             String all_user = "select id from user_test ";
             PreparedStatement ps = con.prepareStatement(all_user);
@@ -234,7 +234,7 @@ public class DataConvert {
         String user = "root";
         String password = "111111";
 
-        String output = "/home/cc01/data/poi/photo/poi_photo_1.txt"; ///home/cc01/data/poi/photo/poi_photo_test.txt
+        String output = "E:/essayData/data/poi/rating/poi_photo_test.txt";
         StringBuffer sb = new StringBuffer();
 
         try{
@@ -447,7 +447,7 @@ public class DataConvert {
         String user = "root";
         String password = "111111";
 
-        String output = "E:/essayData/data/poi/rating/poi_rating_test.txt";
+        String output = "E:/essayData/data/poi/rating/poi_stars_test.txt";
         StringBuffer sb = new StringBuffer();
 
         try{
@@ -598,7 +598,7 @@ public class DataConvert {
         String user = "root";
         String password = "111111";
 
-        String output = "/home/cc01/test.txt";//"/home/cc01/test.txt";// /home/cc01/test.txt
+        String output = "E:/essayData/data/poi/rating/test.txt";
         StringBuffer sb = new StringBuffer();
 
         try{
@@ -611,7 +611,7 @@ public class DataConvert {
             Statement statement = con.createStatement();
 
 
-            String sql = "select count(*) as num from friend ";
+            String sql = "select count(*) as num from friend_test ";
             ResultSet rs = statement.executeQuery(sql);
 
             int count = 0;
@@ -660,82 +660,6 @@ public class DataConvert {
 
 
     }
-
-    /**
-     * 中国正常坐标系GCJ02协议的坐标，转到 百度地图对应的 BD09 协议坐标  (google坐标 转换成 百度坐标)
-     */
-    public static void Convert_GCJ02_To_BD09(){
-        String selectsql = null;
-        ResultSet result = null;
-
-        String url = "jdbc:mysql://10.21.76.120:3306/yelp_db";
-        String name = "com.mysql.jdbc.Driver";
-        String user = "root";
-        String password = "111111";
-
-        Connection conn = null;
-        PreparedStatement pst = null;
-
-//        selectsql = "select latitude,longitude,stars from business ";// 总的查询 SQL语句
-
-        selectsql = "select latitude,longitude,stars from new_business where id in ( SELECT business_id from new_review where user_id='DK57YibC5ShBmqQl97CKog' )";// SQL语句
-
-        try {
-            Class.forName(name);// 指定连接类型
-            conn = DriverManager.getConnection(url, user, password);// 获取连接
-            pst = conn.prepareStatement(selectsql);// 准备执行语句
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        try {
-            result = pst.executeQuery();// 执行语句，得到结果集
-
-            JSONArray jsonArray1 = new JSONArray();
-
-            while (result.next()) {
-                Float latitude = result.getFloat(1);
-                Float longitude = result.getFloat(2);
-                Float stars = result.getFloat(3);
-
-                //google坐标 转换成 百度坐标
-                double x_pi = 3.14159265358979324 * 3000.0 / 180.0;
-                double x = latitude, y = longitude;
-                double z =Math.sqrt(x * x + y * y) + 0.00002 * Math.sin(y * x_pi);
-                double theta = Math.atan2(y, x) + 0.000003 * Math.cos(x * x_pi);
-                double lng = z * Math.cos(theta) + 0.0065;
-                double lat = z * Math.sin(theta) + 0.006;
-
-                //[ [120, 30, 1] ]
-
-                JSONArray jsonArray2 = new JSONArray();
-                jsonArray2.add(lat);
-                jsonArray2.add(lng);
-                jsonArray2.add(stars);
-
-                jsonArray1.add(jsonArray2);
-//				System.out.println(jsonArray2.toString());
-
-            }
-
-            FileWriter writer = new FileWriter("E:/essayData/result/data_single_person_1275.json"); //E:\essayData\result
-            writer.write(jsonArray1.toString());
-//			System.out.println(jsonArray1.toString());
-
-            writer.close();
-            result.close();
-            conn.close();// 关闭连接
-            pst.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }catch (IOException e){
-            e.printStackTrace();
-        }
-
-    }
-
-
-
 
 
 }

@@ -108,7 +108,11 @@ public class DataConvert {
                 ll[0] = latitude;
                 ll[1] = longitude;
                 ll[2] = category;
-                businessMap.put(business_id, ll);
+                LOG.info("装包："+ll[0]+"\t"+ll[1]+"\t"+ll[2]+"\n");
+                if(!businessMap.containsKey(business_id)){
+                    businessMap.put(business_id, ll);
+                }
+
 
             }
 
@@ -136,9 +140,12 @@ public class DataConvert {
                     String business_id = rs_review.getString("business_id");
                     businessList.add(business_id);
                     Object[] ll = (Object[]) businessMap.get(business_id);
+
+                    LOG.info("拆包："+ll[0]+"\t"+ll[1]+"\t"+ll[2]+"\n");
                     latitude_all += (Float) ll[0];
                     longitude_all += (Float) ll[1];
                     String tag = (String) ll[2];
+                    //TODO 临时修改
                     if(categories.containsKey(tag)){
                         categories.put(tag, categories.get(tag) + 1);
                     }else {

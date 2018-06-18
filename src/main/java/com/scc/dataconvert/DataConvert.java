@@ -199,6 +199,9 @@ public class DataConvert {
             }
 
             //根据 user_id 和 business_id 更新数据表字段 fd , tag
+
+            LOG.info("开始 根据 user_id 和 business_id 更新数据表字段 fd , tag");
+
             for(Object[] line : fd_tag_list){
                 String business_id = (String)line[0];
                 String user_id = (String)line[1];

@@ -94,7 +94,7 @@ public class DataConvert {
 
 
             LOG.info("开始 查询 new_business 表记录!");
-            String all_business = "select id,latitude,longitude,category from new_business,category where id=business_id ";
+            String all_business = "select id,latitude,longitude,category from new_business left join category on (id=business_id) ";
             ps = con.prepareStatement(all_business);
             ResultSet rs_business = ps.executeQuery(all_business);
             LOG.info("成功查询到 new_business 表所有 id,latitude,longitude 记录!");
@@ -103,13 +103,14 @@ public class DataConvert {
                 String business_id = rs_business.getString("id");
                 float latitude = rs_business.getFloat("latitude");
                 float longitude = rs_business.getFloat("longitude");
-                String category = rs_business.getString("category");
+                String category = rs_business.getString("category") == null ? "NO":rs_business.getString("category");
                 Object[] ll = new Object[3];
                 ll[0] = latitude;
                 ll[1] = longitude;
                 ll[2] = category;
-                LOG.info("装包："+ll[0]+"\t"+ll[1]+"\t"+ll[2]+"\n");
+
                 if(!businessMap.containsKey(business_id)){
+                    LOG.info("装包："+business_id+"\t"+ll[0]+"\t"+ll[1]+"\t"+ll[2]+"\n");
                     businessMap.put(business_id, ll);
                 }
 
@@ -140,8 +141,6 @@ public class DataConvert {
                     String business_id = rs_review.getString("business_id");
                     businessList.add(business_id);
                     Object[] ll = (Object[]) businessMap.get(business_id);
-
-                    LOG.info("拆包："+ll[0]+"\t"+ll[1]+"\t"+ll[2]+"\n");
                     latitude_all += (Float) ll[0];
                     longitude_all += (Float) ll[1];
                     String tag = (String) ll[2];
@@ -176,7 +175,13 @@ public class DataConvert {
 
                     String category = (String) ll[2];
 
+
+
+                    //tag with NO
                     double tag = categories.get(category) * 1.0 / size * 1.0;
+                    //TODO
+                    //tag without NO
+//                    double tag = category.equals("NO") == true ? 1.0 : categories.get(category) * 1.0 / size * 1.0;
 
                     Object[] line = new Object[4];
                     line[0] = business;
@@ -212,6 +217,8 @@ public class DataConvert {
             String cal = "UPDATE new_review set rating = (stars*fd*tag) ";
             ps = con.prepareStatement(cal);
             ps.executeUpdate(cal);
+
+            LOG.info("new_review 的 rating 字段计算完成！");
 
             ps.close();
 

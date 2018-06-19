@@ -106,13 +106,23 @@ public class DataConvert {
                 float longitude = rs_business.getFloat("longitude");
                 String category = rs_business.getString("category") == null ? "NO":rs_business.getString("category");
 
-                Object[] ll = new Object[3];
-                ll[0] = latitude;
-                ll[1] = longitude;
-                ll[2] = category;
+
                 //TODO 此处的business_id对应多值。不能直接放进map中
                 if(!businessMap.containsKey(business_id)){
-                    businessMap.put(business_id, ll);//此处待修改
+                    Object[] ll = new Object[3];
+                    ll[0] = latitude;
+                    ll[1] = longitude;
+                    List<String> tagList = new ArrayList<String>();
+                    tagList.add(category);
+                    ll[2] = tagList;
+                    businessMap.put(business_id, ll);
+
+                }else {
+                    Object[] ll = (Object[]) businessMap.get(business_id);
+                    List<String> tagList = (List<String>) ll[2];
+                    tagList.add(category);
+                    businessMap.put(business_id, ll);
+
                 }
 
 
@@ -136,7 +146,7 @@ public class DataConvert {
                 List<String> businessList = new ArrayList<String>();
                 float latitude_all = 0;
                 float longitude_all = 0;
-                Map<String, Integer> categories = new HashMap<String, Integer>();//统计每个business对应的tag数量
+                Map<String, Integer> categories = new HashMap<String, Integer>();//统计每个tag对应的business数量
 
                 while(rs_review.next()){
                     String business_id = rs_review.getString("business_id");
@@ -144,18 +154,26 @@ public class DataConvert {
                     Object[] ll = (Object[]) businessMap.get(business_id);
                     latitude_all += (Float) ll[0];
                     longitude_all += (Float) ll[1];
-                    String tag = (String) ll[2];
-                    if(categories.containsKey(tag)){
-                        categories.put(tag, categories.get(tag) + 1);
-                    }else {
-                        categories.put(tag, 1);
+
+                    List<String> tags = (List<String>) ll[2];
+                    for(String tag : tags){
+                        if(categories.containsKey(tag)){
+                            categories.put(tag, categories.get(tag) + 1);
+                        }else {
+                            categories.put(tag, 1);
+                        }
                     }
+
                 }
 
                 //计算 fd,tag
                 int size = businessList.size();
                 float latitude_o = latitude_all / size;
                 float longitude_o = longitude_all / size;
+                int tagSize = 0;
+                for(int value : categories.values()){
+                    tagSize += value;
+                }
 
 
                 for(String business : businessList){
@@ -173,13 +191,17 @@ public class DataConvert {
                         fd = 10 * Math.pow(d, -1);
                     }
 
-                    String category = (String) ll[2];
+                    List<String> category = (List<String>) ll[2];
+                    double tag = 0.0;//保存最终计算的tag值
 
-                    //tag with NO
-                    double tag = categories.get(category) * 1.0 / size * 1.0;
+
+                    for(String c : category){
+                        tag += categories.get(c);
+                    }
+                    tag /= tagSize;
 
                     //tag without NO
-                    //double tag = category.equals("NO") == true ? 1.0 : categories.get(category) * 1.0 / size * 1.0;
+                    //TODO tag without NO
 
                     Object[] line = new Object[4];
                     line[0] = business;

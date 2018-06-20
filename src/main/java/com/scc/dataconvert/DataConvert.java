@@ -76,7 +76,7 @@ public class DataConvert {
             String all_user = "select id from new_user ";
             PreparedStatement ps = con.prepareStatement(all_user);
             ResultSet rs_user = ps.executeQuery(all_user);
-            LOG.info("成功查询到new_user表所有user_id记录!");
+            LOG.info("成功查询到 new_user 表所有user_id记录!");
 
 
             //获得所有用户列表
@@ -104,14 +104,24 @@ public class DataConvert {
                 float latitude = rs_business.getFloat("latitude");
                 float longitude = rs_business.getFloat("longitude");
                 String category = rs_business.getString("category") == null ? "NO":rs_business.getString("category");
-                Object[] ll = new Object[3];
-                ll[0] = latitude;
-                ll[1] = longitude;
-                ll[2] = category;
+
+
 
                 if(!businessMap.containsKey(business_id)){
-                    LOG.info("装包："+business_id+"\t"+ll[0]+"\t"+ll[1]+"\t"+ll[2]+"\n");
+                    Object[] ll = new Object[3];
+                    ll[0] = latitude;
+                    ll[1] = longitude;
+                    List<String> tagList = new ArrayList<String>();
+                    tagList.add(category);
+                    ll[2] = tagList;
                     businessMap.put(business_id, ll);
+
+                }else {
+                    Object[] ll = (Object[]) businessMap.get(business_id);
+                    List<String> tagList = (List<String>) ll[2];
+                    tagList.add(category);
+                    businessMap.put(business_id, ll);
+
                 }
 
 
@@ -125,17 +135,17 @@ public class DataConvert {
 
 
             for(String user_id : userList){
-//                LOG.info("开始 查询 review 表记录!");
+//                LOG.info("开始 查询 new_review 表记录!");
                 String all_review = "select business_id from new_review where user_id='"+ user_id + "'";
                 ps = con.prepareStatement(all_review);
                 ResultSet rs_review = ps.executeQuery(all_review);
-//                LOG.info("成功查询到 review 表所有 business_id 记录!");
+//                LOG.info("成功查询到 new_review 表所有 business_id 记录!");
 
                 //按照user_id获取business_id列表
                 List<String> businessList = new ArrayList<String>();
                 float latitude_all = 0;
                 float longitude_all = 0;
-                Map<String, Integer> categories = new HashMap<String, Integer>();//统计每个business对应的tag数量
+                Map<String, Integer> categories = new HashMap<String, Integer>();//统计每个tag对应的business数量
 
                 while(rs_review.next()){
                     String business_id = rs_review.getString("business_id");
@@ -143,19 +153,26 @@ public class DataConvert {
                     Object[] ll = (Object[]) businessMap.get(business_id);
                     latitude_all += (Float) ll[0];
                     longitude_all += (Float) ll[1];
-                    String tag = (String) ll[2];
-                    //TODO 临时修改
-                    if(categories.containsKey(tag)){
-                        categories.put(tag, categories.get(tag) + 1);
-                    }else {
-                        categories.put(tag, 1);
+
+                    List<String> tags = (List<String>) ll[2];
+                    for(String tag : tags){
+                        if(categories.containsKey(tag)){
+                            categories.put(tag, categories.get(tag) + 1);
+                        }else {
+                            categories.put(tag, 1);
+                        }
                     }
+
                 }
 
                 //计算 fd,tag
                 int size = businessList.size();
                 float latitude_o = latitude_all / size;
                 float longitude_o = longitude_all / size;
+                int tagSize = 0;
+                for(int value : categories.values()){
+                    tagSize += value;
+                }
 
 
                 for(String business : businessList){
@@ -173,15 +190,17 @@ public class DataConvert {
                         fd = 10 * Math.pow(d, -1);
                     }
 
-                    String category = (String) ll[2];
+                    List<String> category = (List<String>) ll[2];
+                    double tag = 0.0;//保存最终计算的tag值
 
 
+                    for(String c : category){
+                        tag += categories.get(c);
+                    }
+                    tag /= tagSize;
 
-                    //tag with NO
-                    double tag = categories.get(category) * 1.0 / size * 1.0;
-                    //TODO
                     //tag without NO
-//                    double tag = category.equals("NO") == true ? 1.0 : categories.get(category) * 1.0 / size * 1.0;
+                    //TODO tag without NO
 
                     Object[] line = new Object[4];
                     line[0] = business;
@@ -199,9 +218,6 @@ public class DataConvert {
             }
 
             //根据 user_id 和 business_id 更新数据表字段 fd , tag
-
-            LOG.info("开始 根据 user_id 和 business_id 更新数据表字段 fd , tag");
-
             for(Object[] line : fd_tag_list){
                 String business_id = (String)line[0];
                 String user_id = (String)line[1];
@@ -221,12 +237,13 @@ public class DataConvert {
             ps = con.prepareStatement(cal);
             ps.executeUpdate(cal);
 
-            LOG.info("new_review 的 rating 字段计算完成！");
-
             ps.close();
+
+            LOG.info("new_review 的 rating 字段计算完成！");
 
         } catch(ClassNotFoundException e){
             LOG.error("找不到 mysql 驱动类!");
+
 
         }catch(SQLException e){
             LOG.error("mysql 连接失败!");
@@ -240,6 +257,7 @@ public class DataConvert {
     }
 
 
+
     public static void photo2txt() throws SQLException, ClassNotFoundException{
 
         Connection con;
@@ -250,7 +268,7 @@ public class DataConvert {
         String user = "root";
         String password = "111111";
 
-        String output = "/home/cc01/data/poi/photo/poi_photo_new.txt"; ///home/cc01/data/poi/photo/poi_photo_test.txt
+        String output = "/home/cc01/data/poi/photo/poi_photo_new.txt";
         StringBuffer sb = new StringBuffer();
 
         try{

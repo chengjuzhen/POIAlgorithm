@@ -54,14 +54,14 @@ public class AlgorithmTest {
 //        svpoi(ratio4, dimension2);
 
         //SVPOI2
-        svpoi2(ratio1, dimension1);
-        svpoi2(ratio1, dimension2);
-        svpoi2(ratio2, dimension1);
-        svpoi2(ratio2, dimension2);
-        svpoi2(ratio3, dimension1);
-        svpoi2(ratio3, dimension2);
-        svpoi2(ratio4, dimension1);
-        svpoi2(ratio4, dimension2);
+//        svpoi2(ratio1, dimension1);
+//        svpoi2(ratio1, dimension2);
+//        svpoi2(ratio2, dimension1);
+//        svpoi2(ratio2, dimension2);
+//        svpoi2(ratio3, dimension1);
+//        svpoi2(ratio3, dimension2);
+//        svpoi2(ratio4, dimension1);
+//        svpoi2(ratio4, dimension2);
 
 
         //sorec
@@ -75,14 +75,14 @@ public class AlgorithmTest {
 //        soRec(ratio4, dimension2);
 
         //pmf
-//        pmf(ratio1, dimension1);
-//        pmf(ratio1, dimension2);
-//        pmf(ratio2, dimension1);
-//        pmf(ratio2, dimension2);
-//        pmf(ratio3, dimension1);
-//        pmf(ratio3, dimension2);
-//        pmf(ratio4, dimension1);
-//        pmf(ratio4, dimension2);
+        pmf(ratio1, dimension1);
+        pmf(ratio1, dimension2);
+        pmf(ratio2, dimension1);
+        pmf(ratio2, dimension2);
+        pmf(ratio3, dimension1);
+        pmf(ratio3, dimension2);
+        pmf(ratio4, dimension1);
+        pmf(ratio4, dimension2);
 
         //trustSVD
 //        trustSVD(ratio1, dimension1);
